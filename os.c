@@ -3,15 +3,11 @@
 
 int main()
 {
-    Directory *root = initialize();
-    Directory *active = root;
+    Context *ctx = initialize();
 
-    Context ctx = {
-        .root = root,
-        .active = active};
+    mini_terminal(ctx);
 
-    mini_terminal(&ctx);
+    free_dir(ctx->root);
 
-    free_dir(root);
     return 0;
 }

@@ -15,9 +15,16 @@ Directory *create_dir(char *name, Directory *parent)
     return dir;
 }
 
-Directory *initialize()
+Context *initialize()
 {
-    return create_dir("root", NULL);
+    Directory *root = create_dir("root", NULL);
+    Directory *active = root;
+
+    Context *ctx = malloc(sizeof(Context));
+    ctx->root = root;
+    ctx->active = active;
+
+    return ctx;
 }
 
 File *create_file(char *name, Directory *parent)

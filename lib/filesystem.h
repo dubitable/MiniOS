@@ -29,7 +29,7 @@ typedef struct
     Directory *active;
 } Context;
 
-Directory *initialize();
+Context *initialize();
 
 Directory *create_dir(char *name, Directory *parent);
 File *create_file(char *name, Directory *parent);
