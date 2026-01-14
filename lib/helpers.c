@@ -1,9 +1,8 @@
-#include <stdbool.h>
 #include <ctype.h>
 
 #include "helpers.h"
 
-bool is_int(char *line)
+int is_int(char *line)
 {
     int current = 0;
 
@@ -11,11 +10,11 @@ bool is_int(char *line)
     {
         if (!isdigit(line[current]))
         {
-            return false;
+            return 0;
         }
 
         current += 1;
     }
 
-    return true;
+    return 1;
 }

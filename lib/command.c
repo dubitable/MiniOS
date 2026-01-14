@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -18,12 +17,12 @@ void where(Directory *current)
     printf("%s/", current->name);
 }
 
-bool action_goto(Context *ctx, int argc, char **argv)
+int action_goto(Context *ctx, int argc, char **argv)
 {
     if (argc < 2)
     {
         printf("[ERR] not enough arguments\n");
-        return false;
+        return 0;
     }
 
     Directory *initial = ctx->active;
@@ -48,7 +47,7 @@ bool action_goto(Context *ctx, int argc, char **argv)
             {
                 printf("[ERR] no such directory\n");
                 ctx->active = initial;
-                return false;
+                return 0;
             }
 
             ctx->active = dir;
@@ -56,27 +55,27 @@ bool action_goto(Context *ctx, int argc, char **argv)
 
         pch = strtok(NULL, "/");
     }
-    return true;
+    return 1;
 };
 
-bool action_mkfile(Context *ctx, int argc, char **argv)
+int action_mkfile(Context *ctx, int argc, char **argv)
 {
     if (argc < 2)
     {
         printf("[ERR] not enough arguments\n");
-        return false;
+        return 0;
     }
 
     if (strcmp(argv[1], "root") == 0)
     {
         printf("[ERR] keyword root not allowed\n");
-        return false;
+        return 0;
     }
 
     if (find_file(ctx, argv[1]))
     {
         printf("[ERR] file already created\n");
-        return false;
+        return 0;
     }
 
     Directory *initial = ctx->active;
@@ -85,38 +84,38 @@ bool action_mkfile(Context *ctx, int argc, char **argv)
     {
         char *goto_argv_array[] = {"goto", argv[2]};
         char **goto_argv = goto_argv_array;
-        bool result = action_goto(ctx, 2, goto_argv);
+        int result = action_goto(ctx, 2, goto_argv);
 
         if (!result)
         {
-            return false;
+            return 0;
         }
     }
 
     File *file = create_file(strdup(argv[1]), ctx->active);
     add_file(ctx->active, file);
     ctx->active = initial;
-    return true;
+    return 1;
 };
 
-bool action_mkdir(Context *ctx, int argc, char **argv)
+int action_mkdir(Context *ctx, int argc, char **argv)
 {
     if (argc < 2)
     {
         printf("[ERR] not enough arguments\n");
-        return false;
+        return 0;
     }
 
     if (strcmp(argv[1], "root") == 0)
     {
         printf("[ERR] keyword root not allowed\n");
-        return false;
+        return 0;
     }
 
     if (find_dir(ctx, argv[1]))
     {
         printf("[ERR] dir already created\n");
-        return false;
+        return 0;
     }
 
     Directory *initial = ctx->active;
@@ -125,30 +124,30 @@ bool action_mkdir(Context *ctx, int argc, char **argv)
     {
         char *goto_argv_array[] = {"goto", argv[2]};
         char **goto_argv = goto_argv_array;
-        bool result = action_goto(ctx, 2, goto_argv);
+        int result = action_goto(ctx, 2, goto_argv);
 
         if (!result)
         {
-            return false;
+            return 0;
         }
     }
 
     Directory *dir = create_dir(strdup(argv[1]), ctx->active);
     add_dir(ctx->active, dir);
     ctx->active = initial;
-    return true;
+    return 1;
 };
 
 int DEFAULT_MAX_DEPTH = 5;
 
-bool action_pkdir(Context *ctx, int argc, char **argv)
+int action_peek(Context *ctx, int argc, char **argv)
 {
     if (argc == 2)
     {
         if (!is_int(argv[1]))
         {
             printf("[ERR] max depth not int\n");
-            return false;
+            return 0;
         }
         peek_dir(ctx->active, atoi(argv[1]));
     }
@@ -157,7 +156,7 @@ bool action_pkdir(Context *ctx, int argc, char **argv)
         peek_dir(ctx->active, DEFAULT_MAX_DEPTH);
     }
 
-    return true;
+    return 1;
 }
 
 void handle_command(Context *ctx, Command cmd, int argc, char **argv)
@@ -170,8 +169,8 @@ void handle_command(Context *ctx, Command cmd, int argc, char **argv)
     case COMMAND_MKDIR:
         action_mkdir(ctx, argc, argv);
         break;
-    case COMMAND_PKDIR:
-        action_pkdir(ctx, argc, argv);
+    case COMMAND_PEEK:
+        action_peek(ctx, argc, argv);
         break;
     case COMMAND_GOTO:
         action_goto(ctx, argc, argv);
@@ -229,8 +228,8 @@ Command command_from_string(const char *str)
         return COMMAND_MKFILE;
     if (strcmp(str, "mkdir") == 0)
         return COMMAND_MKDIR;
-    if (strcmp(str, "pkdir") == 0)
-        return COMMAND_PKDIR;
+    if (strcmp(str, "peek") == 0)
+        return COMMAND_PEEK;
     if (strcmp(str, "goto") == 0)
         return COMMAND_GOTO;
     return COMMAND_NONE;
@@ -238,7 +237,7 @@ Command command_from_string(const char *str)
 
 void mini_terminal(Context *ctx)
 {
-    bool running = true;
+    int running = 1;
 
     while (running)
     {
@@ -254,7 +253,7 @@ void mini_terminal(Context *ctx)
 
         if (strcmp(line, "exit") == 0)
         {
-            running = false;
+            running = 0;
             break;
         }
 
