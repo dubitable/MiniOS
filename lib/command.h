@@ -1,6 +1,8 @@
 #ifndef COMMAND_H_INCLUDED
 #define COMMAND_H_INCLUDED
 
+#include <stdbool.h>
+
 typedef enum
 {
     COMMAND_MKFILE,
@@ -13,7 +15,7 @@ typedef enum
 typedef struct
 {
     CommandName name;
-    void (*action)(Context *ctx, int argc, char **argv);
+    bool (*action)(Context *ctx, int argc, char **argv);
 } Command;
 
 void mini_terminal(Context *ctx);

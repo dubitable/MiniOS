@@ -37,6 +37,9 @@ File *create_file(char *name, Directory *parent);
 Directory *add_file(Directory *parent, File *file);
 Directory *add_dir(Directory *parent, Directory *dir);
 
+Directory *find_dir(Context *ctx, char *dir_name);
+File *find_file(Context *ctx, char *filename);
+
 void peek_dir(Directory *dir, int max_depth);
 
 void free_dir(Directory *dir);

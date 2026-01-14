@@ -52,6 +52,34 @@ Directory *add_dir(Directory *parent, Directory *dir)
     return parent;
 }
 
+Directory *find_dir(Context *ctx, char *dir_name)
+{
+    for (int i = 0; i < ctx->active->dir_count; i++)
+    {
+        Directory *dir = ctx->active->directories[i];
+        if (strcmp(dir->name, dir_name) == 0)
+        {
+            return dir;
+        }
+    }
+
+    return NULL;
+}
+
+File *find_file(Context *ctx, char *filename)
+{
+    for (int i = 0; i < ctx->active->file_count; i++)
+    {
+        File *file = ctx->active->files[i];
+        if (strcmp(file->name, filename) == 0)
+        {
+            return file;
+        }
+    }
+
+    return NULL;
+}
+
 void rec_peek_dir(Directory *dir, int depth, int max_depth)
 {
     printf("%s\n", dir->name);

@@ -18,85 +18,12 @@ void where(Directory *current)
     printf("%s/", current->name);
 }
 
-void action_mkfile(Context *ctx, int argc, char **argv)
+bool action_goto(Context *ctx, int argc, char **argv)
 {
     if (argc < 2)
     {
         printf("[ERR] not enough arguments\n");
-        return;
-    }
-
-    File *file = create_file(strdup(argv[1]), ctx->active);
-    add_file(ctx->active, file);
-};
-
-Command cmd_mkfile = {
-    .name = COMMAND_MKFILE,
-    .action = &action_mkfile};
-
-void action_mkdir(Context *ctx, int argc, char **argv)
-{
-    if (argc < 2)
-    {
-        printf("[ERR] not enough arguments\n");
-        return;
-    }
-
-    if (strcmp(argv[1], "root") == 0)
-    {
-        printf("[ERR] keyword root not allowed\n");
-    }
-
-    Directory *dir = create_dir(strdup(argv[1]), ctx->active);
-    add_dir(ctx->active, dir);
-};
-
-Command cmd_mkdir = {
-    .name = COMMAND_MKDIR,
-    .action = &action_mkdir};
-
-int DEFAULT_MAX_DEPTH = 5;
-void action_pkdir(Context *ctx, int argc, char **argv)
-{
-    if (argc == 2)
-    {
-        if (!is_int(argv[1]))
-        {
-            printf("[ERR] max depth not int\n");
-            return;
-        }
-        peek_dir(ctx->active, atoi(argv[1]));
-    }
-    else
-    {
-        peek_dir(ctx->active, DEFAULT_MAX_DEPTH);
-    }
-}
-
-Command cmd_pkdir = {
-    .name = COMMAND_PKDIR,
-    .action = &action_pkdir};
-
-Directory *find_dir(Context *ctx, char *dir_name)
-{
-    for (int i = 0; i < ctx->active->dir_count; i++)
-    {
-        Directory *dir = ctx->active->directories[i];
-        if (strcmp(dir->name, dir_name) == 0)
-        {
-            return dir;
-        }
-    }
-
-    return NULL;
-}
-
-void action_goto(Context *ctx, int argc, char **argv)
-{
-    if (argc < 2)
-    {
-        printf("[ERR] not enough arguments\n");
-        return;
+        return false;
     }
 
     Directory *initial = ctx->active;
@@ -121,7 +48,7 @@ void action_goto(Context *ctx, int argc, char **argv)
             {
                 printf("[ERR] no such directory\n");
                 ctx->active = initial;
-                return;
+                return false;
             }
 
             ctx->active = dir;
@@ -129,11 +56,125 @@ void action_goto(Context *ctx, int argc, char **argv)
 
         pch = strtok(NULL, "/");
     }
+    return true;
 };
 
 Command cmd_goto = {
     .name = COMMAND_GOTO,
     .action = &action_goto};
+
+bool action_mkfile(Context *ctx, int argc, char **argv)
+{
+    if (argc < 2)
+    {
+        printf("[ERR] not enough arguments\n");
+        return false;
+    }
+
+    if (strcmp(argv[1], "root") == 0)
+    {
+        printf("[ERR] keyword root not allowed\n");
+        return false;
+    }
+
+    if (find_file(ctx, argv[1]))
+    {
+        printf("[ERR] file already created\n");
+        return false;
+    }
+
+    Directory *initial = ctx->active;
+
+    if (argc == 3)
+    {
+        char *goto_argv_array[] = {"goto", argv[2]};
+        char **goto_argv = goto_argv_array;
+        bool result = action_goto(ctx, 2, goto_argv);
+
+        if (!result)
+        {
+            return false;
+        }
+    }
+
+    File *file = create_file(strdup(argv[1]), ctx->active);
+    add_file(ctx->active, file);
+    ctx->active = initial;
+    return true;
+};
+
+Command cmd_mkfile = {
+    .name = COMMAND_MKFILE,
+    .action = &action_mkfile};
+
+bool action_mkdir(Context *ctx, int argc, char **argv)
+{
+    if (argc < 2)
+    {
+        printf("[ERR] not enough arguments\n");
+        return false;
+    }
+
+    if (strcmp(argv[1], "root") == 0)
+    {
+        printf("[ERR] keyword root not allowed\n");
+        return false;
+    }
+
+    if (find_dir(ctx, argv[1]))
+    {
+        printf("[ERR] dir already created\n");
+        return false;
+    }
+
+    Directory *initial = ctx->active;
+
+    if (argc == 3)
+    {
+        char *goto_argv_array[] = {"goto", argv[2]};
+        char **goto_argv = goto_argv_array;
+        bool result = action_goto(ctx, 2, goto_argv);
+
+        if (!result)
+        {
+            return false;
+        }
+    }
+
+    Directory *dir = create_dir(strdup(argv[1]), ctx->active);
+    add_dir(ctx->active, dir);
+    ctx->active = initial;
+    return true;
+};
+
+Command cmd_mkdir = {
+    .name = COMMAND_MKDIR,
+    .action = &action_mkdir};
+
+int DEFAULT_MAX_DEPTH = 5;
+
+bool action_pkdir(Context *ctx, int argc, char **argv)
+{
+    if (argc == 2)
+    {
+        if (!is_int(argv[1]))
+        {
+            printf("[ERR] max depth not int\n");
+            return false;
+        }
+        peek_dir(ctx->active, atoi(argv[1]));
+    }
+    else
+    {
+        peek_dir(ctx->active, DEFAULT_MAX_DEPTH);
+    }
+
+    return true;
+}
+
+Command cmd_pkdir = {
+    .name = COMMAND_PKDIR,
+    .action = &action_pkdir};
 
 void handle_command(Context *ctx, CommandName cmd, int argc, char **argv)
 {
