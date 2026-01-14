@@ -14,7 +14,6 @@ typedef struct
 {
     CommandName name;
     void (*action)(Context *ctx, int argc, char **argv);
-    int argc;
 } Command;
 
 void mini_terminal(Context *ctx);
