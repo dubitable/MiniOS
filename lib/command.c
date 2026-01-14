@@ -59,10 +59,6 @@ bool action_goto(Context *ctx, int argc, char **argv)
     return true;
 };
 
-Command cmd_goto = {
-    .name = COMMAND_GOTO,
-    .action = &action_goto};
-
 bool action_mkfile(Context *ctx, int argc, char **argv)
 {
     if (argc < 2)
@@ -102,10 +98,6 @@ bool action_mkfile(Context *ctx, int argc, char **argv)
     ctx->active = initial;
     return true;
 };
-
-Command cmd_mkfile = {
-    .name = COMMAND_MKFILE,
-    .action = &action_mkfile};
 
 bool action_mkdir(Context *ctx, int argc, char **argv)
 {
@@ -147,10 +139,6 @@ bool action_mkdir(Context *ctx, int argc, char **argv)
     return true;
 };
 
-Command cmd_mkdir = {
-    .name = COMMAND_MKDIR,
-    .action = &action_mkdir};
-
 int DEFAULT_MAX_DEPTH = 5;
 
 bool action_pkdir(Context *ctx, int argc, char **argv)
@@ -172,25 +160,21 @@ bool action_pkdir(Context *ctx, int argc, char **argv)
     return true;
 }
 
-Command cmd_pkdir = {
-    .name = COMMAND_PKDIR,
-    .action = &action_pkdir};
-
-void handle_command(Context *ctx, CommandName cmd, int argc, char **argv)
+void handle_command(Context *ctx, Command cmd, int argc, char **argv)
 {
     switch (cmd)
     {
     case COMMAND_MKFILE:
-        cmd_mkfile.action(ctx, argc, argv);
+        action_mkfile(ctx, argc, argv);
         break;
     case COMMAND_MKDIR:
-        cmd_mkdir.action(ctx, argc, argv);
+        action_mkdir(ctx, argc, argv);
         break;
     case COMMAND_PKDIR:
-        cmd_pkdir.action(ctx, argc, argv);
+        action_pkdir(ctx, argc, argv);
         break;
     case COMMAND_GOTO:
-        cmd_goto.action(ctx, argc, argv);
+        action_goto(ctx, argc, argv);
         break;
     default:
         break;
@@ -239,7 +223,7 @@ void free_args(Args *args)
     free(args);
 }
 
-CommandName command_from_string(const char *str)
+Command command_from_string(const char *str)
 {
     if (strcmp(str, "mkfile") == 0)
         return COMMAND_MKFILE;
@@ -281,7 +265,7 @@ void mini_terminal(Context *ctx)
             continue;
         }
 
-        CommandName cmd = command_from_string(args->argv[0]);
+        Command cmd = command_from_string(args->argv[0]);
 
         handle_command(ctx, cmd, args->argc, args->argv);
 

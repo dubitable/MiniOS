@@ -10,12 +10,6 @@ typedef enum
     COMMAND_PKDIR,
     COMMAND_GOTO,
     COMMAND_NONE
-} CommandName;
-
-typedef struct
-{
-    CommandName name;
-    bool (*action)(Context *ctx, int argc, char **argv);
 } Command;
 
 void mini_terminal(Context *ctx);
