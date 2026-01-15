@@ -2,7 +2,6 @@
 #define COMMAND_H_INCLUDED
 
 #include "filesystem.h"
-#include "gui/terminal.h"
 
 typedef enum
 {

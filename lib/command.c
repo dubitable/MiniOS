@@ -192,11 +192,11 @@ int action_peek(TerminalState *state, int argc, char **argv)
             print_stdout("[ERR] max depth not int\n", state);
             return 0;
         }
-        peek_dir(state->ctx->active_dir, atoi(argv[1]));
+        peek_dir(state, state->ctx->active_dir, atoi(argv[1]));
     }
     else
     {
-        peek_dir(state->ctx->active_dir, DEFAULT_MAX_DEPTH);
+        peek_dir(state, state->ctx->active_dir, DEFAULT_MAX_DEPTH);
     }
 
     return 1;

@@ -1,6 +1,8 @@
 #ifndef FILESYSTEM_H_INCLUDED
 #define FILESYSTEM_H_INCLUDED
 
+#include "gui/cube.h"
+
 typedef struct File File;
 typedef struct Dir Directory;
 
@@ -37,6 +39,25 @@ typedef struct
     Window active_window;
 } Context;
 
+enum
+{
+    PATH_SIZE = 100,
+    INPUT_SIZE = 100,
+    STDOUT_SIZE = 200,
+};
+
+typedef struct
+{
+    Context *ctx;
+    char path[PATH_SIZE];
+    Point2D cursor;
+
+    char input[INPUT_SIZE];
+    int input_count;
+
+    char std_out[STDOUT_SIZE];
+} TerminalState;
+
 Context *initialize();
 
 Directory *create_dir(char *name, Directory *parent);
@@ -47,8 +68,6 @@ Directory *add_dir(Directory *parent, Directory *dir);
 
 Directory *find_dir(Context *ctx, char *dir_name);
 File *find_file(Context *ctx, char *filename);
-
-void peek_dir(Directory *dir, int max_depth);
 
 void free_dir(Directory *dir);
 void free_ctx(Context *ctx);

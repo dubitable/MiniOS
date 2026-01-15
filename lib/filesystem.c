@@ -109,36 +109,6 @@ File *find_file(Context *ctx, char *filename)
     return NULL;
 }
 
-void rec_peek_dir(Directory *dir, int depth, int max_depth)
-{
-    printf("%s\n", dir->name);
-
-    if (max_depth == 0)
-    {
-        return;
-    }
-
-    for (int i = 0; i < dir->dir_count; i++)
-    {
-        for (int d = 0; d < depth; d++)
-            printf("    ");
-        printf("|-- ");
-        rec_peek_dir(dir->directories[i], depth + 1, max_depth - 1);
-    }
-
-    for (int j = 0; j < dir->file_count; j++)
-    {
-        for (int d = 0; d < depth; d++)
-            printf("    ");
-        printf("|-- %s\n", dir->files[j]->name);
-    }
-}
-
-void peek_dir(Directory *dir, int max_depth)
-{
-    rec_peek_dir(dir, 0, max_depth);
-}
-
 void free_dir(Directory *dir)
 {
     for (int i = 0; i < dir->dir_count; i++)

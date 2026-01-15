@@ -26,14 +26,22 @@ void initialize_window(Context *ctx)
 
     while (!WindowShouldClose())
     {
-        if (IsKeyDown(KEY_RIGHT))
-        {
-            ctx->active_window = WINDOW_TERMINAL;
-        }
 
-        else if (IsKeyDown(KEY_LEFT))
+        if (IsKeyDown(KEY_LEFT_CONTROL))
         {
-            ctx->active_window = WINDOW_WELCOME;
+            DrawText(":", W - 30, H - 30, 20, WHITE);
+
+            if (IsKeyPressed(KEY_W))
+            {
+                ctx->active_window = WINDOW_WELCOME;
+                GetCharPressed();
+            }
+
+            if (IsKeyPressed(KEY_T))
+            {
+                ctx->active_window = WINDOW_TERMINAL;
+                GetCharPressed();
+            }
         }
 
         switch (ctx->active_window)
