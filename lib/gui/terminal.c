@@ -10,9 +10,9 @@ const int FONT_SIZE = 20;
 
 void rec_peek_dir(TerminalState *state, Directory *dir, int depth, int max_depth)
 {
-    int DIRNAME_SIZE = strlen(dir->name) + 2;
+    int DIRNAME_SIZE = strlen(dir->name) + 3;
     char dirname[DIRNAME_SIZE];
-    snprintf(dirname, DIRNAME_SIZE, "%s\n", dir->name);
+    snprintf(dirname, DIRNAME_SIZE, "%s/\n", dir->name);
     print_stdout(dirname, state);
 
     if (max_depth == 0)
@@ -33,7 +33,7 @@ void rec_peek_dir(TerminalState *state, Directory *dir, int depth, int max_depth
         for (int d = 0; d < depth; d++)
             print_stdout("    ", state);
 
-        int FILENAME_SIZE = strlen(dir->files[j]->name) + 2;
+        int FILENAME_SIZE = strlen(dir->files[j]->name) + 6;
         char filename[FILENAME_SIZE];
         snprintf(filename, FILENAME_SIZE, "|-- %s\n", dir->files[j]->name);
         print_stdout(filename, state);
