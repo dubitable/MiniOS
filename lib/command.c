@@ -6,17 +6,6 @@
 #include "command.h"
 #include "helpers.h"
 
-void where(Directory *current)
-{
-    if (current == NULL)
-    {
-        return;
-    }
-
-    where(current->parent);
-    printf("%s/", current->name);
-}
-
 int action_goto(Context *ctx, int argc, char **argv)
 {
     if (argc < 2)
@@ -180,48 +169,6 @@ void handle_command(Context *ctx, Command cmd, int argc, char **argv)
     }
 }
 
-typedef struct
-{
-    int argc;
-    char **argv;
-} Args;
-
-Args *parse_line(char line[])
-{
-    Args *args = malloc(sizeof(Args));
-    args->argc = 0;
-    args->argv = NULL;
-
-    char *pch = strtok(line, " ");
-    while (pch != NULL)
-    {
-        args->argc++;
-
-        args->argv = realloc(args->argv, args->argc * sizeof(char *));
-        args->argv[args->argc - 1] = strdup(pch);
-
-        pch = strtok(NULL, " ");
-    }
-
-    return args;
-}
-
-void free_args(Args *args)
-{
-    if (args == NULL)
-    {
-        return;
-    }
-
-    for (int i = 0; i < args->argc; i++)
-    {
-        free(args->argv[i]);
-    }
-
-    free(args->argv);
-    free(args);
-}
-
 Command command_from_string(const char *str)
 {
     if (strcmp(str, "mkfile") == 0)
@@ -233,41 +180,4 @@ Command command_from_string(const char *str)
     if (strcmp(str, "goto") == 0)
         return COMMAND_GOTO;
     return COMMAND_NONE;
-}
-
-void mini_terminal(Context *ctx)
-{
-    int running = 1;
-
-    while (running)
-    {
-        where(ctx->active);
-        printf(" > ");
-
-        char line[1024];
-
-        if (fgets(line, sizeof(line), stdin))
-        {
-            line[strcspn(line, "\n")] = 0;
-        }
-
-        if (strcmp(line, "exit") == 0)
-        {
-            running = 0;
-            break;
-        }
-
-        Args *args = parse_line(line);
-
-        if (args->argc == 0)
-        {
-            continue;
-        }
-
-        Command cmd = command_from_string(args->argv[0]);
-
-        handle_command(ctx, cmd, args->argc, args->argv);
-
-        free_args(args);
-    }
 }

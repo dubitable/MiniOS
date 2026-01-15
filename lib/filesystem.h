@@ -43,5 +43,6 @@ File *find_file(Context *ctx, char *filename);
 void peek_dir(Directory *dir, int max_depth);
 
 void free_dir(Directory *dir);
+void free_ctx(Context *ctx);
 
 #endif

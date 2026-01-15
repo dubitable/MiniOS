@@ -1,6 +1,8 @@
 #ifndef COMMAND_H_INCLUDED
 #define COMMAND_H_INCLUDED
 
+#include "filesystem.h"
+
 typedef enum
 {
     COMMAND_MKFILE,
@@ -10,6 +12,7 @@ typedef enum
     COMMAND_NONE
 } Command;
 
-void mini_terminal(Context *ctx);
+Command command_from_string(const char *str);
+void handle_command(Context *ctx, Command cmd, int argc, char **argv);
 
 #endif

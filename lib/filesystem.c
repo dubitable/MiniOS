@@ -126,3 +126,8 @@ void free_dir(Directory *dir)
     free(dir->directories);
     free(dir);
 }
+
+void free_ctx(Context *ctx)
+{
+    free_dir(ctx->root);
+}
