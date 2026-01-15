@@ -1,11 +1,11 @@
 #include "lib/filesystem.h"
 #include "lib/command.h"
-#include "lib/minigui.h"
+#include "lib/gui/minigui.h"
 
 int main()
 {
     Context *ctx = initialize();
-    open_terminal(ctx);
+    initialize_window(ctx);
     free_ctx(ctx);
 
     return 0;

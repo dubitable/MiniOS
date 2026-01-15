@@ -23,10 +23,18 @@ struct File
     char *content;
 };
 
+typedef enum
+{
+    WINDOW_WELCOME,
+    WINDOW_TERMINAL
+} Window;
+
 typedef struct
 {
-    Directory *root;
-    Directory *active;
+    Directory *root_dir;
+    Directory *active_dir;
+
+    Window active_window;
 } Context;
 
 Context *initialize();
@@ -44,5 +52,7 @@ void peek_dir(Directory *dir, int max_depth);
 
 void free_dir(Directory *dir);
 void free_ctx(Context *ctx);
+
+void where(Directory *current, char *buffer, int size);
 
 #endif

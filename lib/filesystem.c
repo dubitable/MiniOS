@@ -1,7 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "gui/terminal.h"
 #include "filesystem.h"
+
+void where(Directory *current, char *buffer, int size)
+{
+    if (current == NULL)
+    {
+        return;
+    }
+
+    where(current->parent, buffer, size);
+
+    int used = strlen(buffer);
+    int remain = size - used - 1;
+
+    if (remain > 0)
+    {
+        strncat(buffer, current->name, remain);
+    }
+
+    used = strlen(buffer);
+    remain = size - used - 1;
+
+    if (remain > 0)
+    {
+        strncat(buffer, "/", remain);
+    }
+}
 
 Directory *create_dir(char *name, Directory *parent)
 {
@@ -17,12 +45,13 @@ Directory *create_dir(char *name, Directory *parent)
 
 Context *initialize()
 {
-    Directory *root = create_dir("root", NULL);
-    Directory *active = root;
+    Directory *root_dir = create_dir("root", NULL);
+    Directory *active_dir = root_dir;
 
     Context *ctx = malloc(sizeof(Context));
-    ctx->root = root;
-    ctx->active = active;
+    ctx->root_dir = root_dir;
+    ctx->active_dir = active_dir;
+    ctx->active_window = WINDOW_WELCOME;
 
     return ctx;
 }
@@ -54,9 +83,9 @@ Directory *add_dir(Directory *parent, Directory *dir)
 
 Directory *find_dir(Context *ctx, char *dir_name)
 {
-    for (int i = 0; i < ctx->active->dir_count; i++)
+    for (int i = 0; i < ctx->active_dir->dir_count; i++)
     {
-        Directory *dir = ctx->active->directories[i];
+        Directory *dir = ctx->active_dir->directories[i];
         if (strcmp(dir->name, dir_name) == 0)
         {
             return dir;
@@ -68,9 +97,9 @@ Directory *find_dir(Context *ctx, char *dir_name)
 
 File *find_file(Context *ctx, char *filename)
 {
-    for (int i = 0; i < ctx->active->file_count; i++)
+    for (int i = 0; i < ctx->active_dir->file_count; i++)
     {
-        File *file = ctx->active->files[i];
+        File *file = ctx->active_dir->files[i];
         if (strcmp(file->name, filename) == 0)
         {
             return file;
@@ -129,5 +158,6 @@ void free_dir(Directory *dir)
 
 void free_ctx(Context *ctx)
 {
-    free_dir(ctx->root);
+    free_dir(ctx->root_dir);
+    free(ctx);
 }

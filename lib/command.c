@@ -1,20 +1,74 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
+#include "gui/terminal.h"
 #include "filesystem.h"
 #include "command.h"
-#include "helpers.h"
 
-int action_goto(Context *ctx, int argc, char **argv)
+Args *parse_line(char line[])
+{
+    Args *args = malloc(sizeof(Args));
+    args->argc = 0;
+    args->argv = NULL;
+
+    char *pch = strtok(line, " ");
+    while (pch != NULL)
+    {
+        args->argc++;
+
+        args->argv = realloc(args->argv, args->argc * sizeof(char *));
+        args->argv[args->argc - 1] = strdup(pch);
+
+        pch = strtok(NULL, " ");
+    }
+
+    return args;
+}
+
+void free_args(Args *args)
+{
+    if (args == NULL)
+    {
+        return;
+    }
+
+    for (int i = 0; i < args->argc; i++)
+    {
+        free(args->argv[i]);
+    }
+
+    free(args->argv);
+    free(args);
+}
+
+int is_int(char *line)
+{
+    int current = 0;
+
+    while (line[current] != '\0')
+    {
+        if (!isdigit(line[current]))
+        {
+            return 0;
+        }
+
+        current += 1;
+    }
+
+    return 1;
+}
+
+int action_goto(TerminalState *state, int argc, char **argv)
 {
     if (argc < 2)
     {
-        printf("[ERR] not enough arguments\n");
+        print_stdout("[ERR] not enough arguments\n", state);
         return 0;
     }
 
-    Directory *initial = ctx->active;
+    Directory *initial = state->ctx->active_dir;
     char *path = argv[1];
 
     char *pch = strtok(path, "/");
@@ -22,24 +76,24 @@ int action_goto(Context *ctx, int argc, char **argv)
     {
         if (strcmp(pch, "root") == 0)
         {
-            ctx->active = ctx->root;
+            state->ctx->active_dir = state->ctx->root_dir;
         }
         else if (strcmp(pch, "<-") == 0)
         {
-            ctx->active = ctx->active->parent;
+            state->ctx->active_dir = state->ctx->active_dir->parent;
         }
         else
         {
-            Directory *dir = find_dir(ctx, pch);
+            Directory *dir = find_dir(state->ctx, pch);
 
             if (dir == NULL)
             {
-                printf("[ERR] no such directory\n");
-                ctx->active = initial;
+                print_stdout("[ERR] no such directory\n", state);
+                state->ctx->active_dir = initial;
                 return 0;
             }
 
-            ctx->active = dir;
+            state->ctx->active_dir = dir;
         }
 
         pch = strtok(NULL, "/");
@@ -47,33 +101,33 @@ int action_goto(Context *ctx, int argc, char **argv)
     return 1;
 };
 
-int action_mkfile(Context *ctx, int argc, char **argv)
+int action_mkfile(TerminalState *state, int argc, char **argv)
 {
     if (argc < 2)
     {
-        printf("[ERR] not enough arguments\n");
+        print_stdout("[ERR] not enough arguments\n", state);
         return 0;
     }
 
     if (strcmp(argv[1], "root") == 0)
     {
-        printf("[ERR] keyword root not allowed\n");
+        print_stdout("[ERR] keyword root not allowed\n", state);
         return 0;
     }
 
-    if (find_file(ctx, argv[1]))
+    if (find_file(state->ctx, argv[1]))
     {
-        printf("[ERR] file already created\n");
+        print_stdout("[ERR] file already created\n", state);
         return 0;
     }
 
-    Directory *initial = ctx->active;
+    Directory *initial = state->ctx->active_dir;
 
     if (argc == 3)
     {
         char *goto_argv_array[] = {"goto", argv[2]};
         char **goto_argv = goto_argv_array;
-        int result = action_goto(ctx, 2, goto_argv);
+        int result = action_goto(state, 2, goto_argv);
 
         if (!result)
         {
@@ -81,39 +135,39 @@ int action_mkfile(Context *ctx, int argc, char **argv)
         }
     }
 
-    File *file = create_file(strdup(argv[1]), ctx->active);
-    add_file(ctx->active, file);
-    ctx->active = initial;
+    File *file = create_file(strdup(argv[1]), state->ctx->active_dir);
+    add_file(state->ctx->active_dir, file);
+    state->ctx->active_dir = initial;
     return 1;
 };
 
-int action_mkdir(Context *ctx, int argc, char **argv)
+int action_mkdir(TerminalState *state, int argc, char **argv)
 {
     if (argc < 2)
     {
-        printf("[ERR] not enough arguments\n");
+        print_stdout("[ERR] not enough arguments\n", state);
         return 0;
     }
 
     if (strcmp(argv[1], "root") == 0)
     {
-        printf("[ERR] keyword root not allowed\n");
+        print_stdout("[ERR] keyword root not allowed\n", state);
         return 0;
     }
 
-    if (find_dir(ctx, argv[1]))
+    if (find_dir(state->ctx, argv[1]))
     {
-        printf("[ERR] dir already created\n");
+        print_stdout("[ERR] dir already created\n", state);
         return 0;
     }
 
-    Directory *initial = ctx->active;
+    Directory *initial = state->ctx->active_dir;
 
     if (argc == 3)
     {
         char *goto_argv_array[] = {"goto", argv[2]};
         char **goto_argv = goto_argv_array;
-        int result = action_goto(ctx, 2, goto_argv);
+        int result = action_goto(state, 2, goto_argv);
 
         if (!result)
         {
@@ -121,48 +175,48 @@ int action_mkdir(Context *ctx, int argc, char **argv)
         }
     }
 
-    Directory *dir = create_dir(strdup(argv[1]), ctx->active);
-    add_dir(ctx->active, dir);
-    ctx->active = initial;
+    Directory *dir = create_dir(strdup(argv[1]), state->ctx->active_dir);
+    add_dir(state->ctx->active_dir, dir);
+    state->ctx->active_dir = initial;
     return 1;
 };
 
 int DEFAULT_MAX_DEPTH = 5;
 
-int action_peek(Context *ctx, int argc, char **argv)
+int action_peek(TerminalState *state, int argc, char **argv)
 {
     if (argc == 2)
     {
         if (!is_int(argv[1]))
         {
-            printf("[ERR] max depth not int\n");
+            print_stdout("[ERR] max depth not int\n", state);
             return 0;
         }
-        peek_dir(ctx->active, atoi(argv[1]));
+        peek_dir(state->ctx->active_dir, atoi(argv[1]));
     }
     else
     {
-        peek_dir(ctx->active, DEFAULT_MAX_DEPTH);
+        peek_dir(state->ctx->active_dir, DEFAULT_MAX_DEPTH);
     }
 
     return 1;
 }
 
-void handle_command(Context *ctx, Command cmd, int argc, char **argv)
+void handle_command(TerminalState *state, Command cmd, int argc, char **argv)
 {
     switch (cmd)
     {
     case COMMAND_MKFILE:
-        action_mkfile(ctx, argc, argv);
+        action_mkfile(state, argc, argv);
         break;
     case COMMAND_MKDIR:
-        action_mkdir(ctx, argc, argv);
+        action_mkdir(state, argc, argv);
         break;
     case COMMAND_PEEK:
-        action_peek(ctx, argc, argv);
+        action_peek(state, argc, argv);
         break;
     case COMMAND_GOTO:
-        action_goto(ctx, argc, argv);
+        action_goto(state, argc, argv);
         break;
     default:
         break;

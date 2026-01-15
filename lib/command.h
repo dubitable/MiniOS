@@ -2,6 +2,7 @@
 #define COMMAND_H_INCLUDED
 
 #include "filesystem.h"
+#include "gui/terminal.h"
 
 typedef enum
 {
@@ -12,7 +13,15 @@ typedef enum
     COMMAND_NONE
 } Command;
 
+typedef struct
+{
+    int argc;
+    char **argv;
+} Args;
+
+Args *parse_line(char line[]);
+
 Command command_from_string(const char *str);
-void handle_command(Context *ctx, Command cmd, int argc, char **argv);
+void handle_command(TerminalState *state, Command cmd, int argc, char **argv);
 
 #endif
