@@ -239,6 +239,16 @@ int action_peek(Context *ctx, char *printto, int size, int argc, char **argv)
 
     return 1;
 }
+
+int action_pong(Context *ctx)
+{
+    PongState *pong_state = init_pong(ctx->W, ctx->H);
+    ctx->active_data = pong_state;
+    ctx->active_window = WINDOW_PONG;
+
+    return 1;
+}
+
 void handle_command(Command cmd, int argc, char **argv, Context *ctx, char *printto, int size)
 {
     switch (cmd)
@@ -255,6 +265,9 @@ void handle_command(Command cmd, int argc, char **argv, Context *ctx, char *prin
     case COMMAND_GOTO:
         action_goto(ctx, printto, size, argc, argv);
         break;
+    case COMMAND_PONG:
+        action_pong(ctx);
+        break;
     default:
         break;
     }
@@ -270,5 +283,7 @@ Command command_from_string(const char *str)
         return COMMAND_PEEK;
     if (strcmp(str, "goto") == 0)
         return COMMAND_GOTO;
+    if (strcmp(str, "pong") == 0)
+        return COMMAND_PONG;
     return COMMAND_NONE;
 }

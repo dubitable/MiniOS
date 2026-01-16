@@ -13,7 +13,7 @@ typedef struct
     Point3D center;
 } CubeState;
 
-CubeState init_cube(int FPS);
+CubeState *init_cube(int FPS);
 void window_welcome(CubeState *state, int W, int H);
 
 #endif

@@ -27,7 +27,7 @@ typedef struct
     int H;
 } PongState;
 
-PongState init_pong(int W, int H);
+PongState *init_pong(int, int);
 void window_pong(PongState *);
 
 #endif

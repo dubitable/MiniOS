@@ -1,17 +1,18 @@
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "cube.h"
 #include "../geometry.h"
 
 #include "raylib.h"
 
-CubeState init_cube(int FPS)
+CubeState *init_cube(int FPS)
 {
-    CubeState out;
-    out.dt = (0.25f / FPS);
-    out.dz = 0;
-    out.angle = 0;
+    CubeState *out = malloc(sizeof(CubeState));
+    out->dt = (0.25f / FPS);
+    out->dz = 0;
+    out->angle = 0;
 
     Point3D points[] = {
         {0.5f, 0.5f, 2},   // top right
@@ -40,10 +41,10 @@ CubeState init_cube(int FPS)
         {3, 7}};
 
     Point3D center = {0, 0, 2.5f};
-    out.center = center;
+    out->center = center;
 
-    memcpy(out.points, points, sizeof(points));
-    memcpy(out.edges, edges, sizeof(edges));
+    memcpy(out->points, points, sizeof(points));
+    memcpy(out->edges, edges, sizeof(edges));
 
     return out;
 }

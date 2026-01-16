@@ -16,7 +16,7 @@ typedef struct
     char std_out[STDOUT_SIZE];
 } TerminalState;
 
-TerminalState init_terminal(Context *ctx);
+TerminalState *init_terminal(Context *ctx);
 void window_terminal(TerminalState *state);
 void clear_terminal(TerminalState *state);
 

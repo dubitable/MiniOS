@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "terminal.h"
 #include "../command.h"
@@ -27,13 +28,13 @@ void clear_std_out(TerminalState *state)
     snprintf(state->std_out, STDOUT_SIZE, "");
 }
 
-TerminalState init_terminal(Context *ctx)
+TerminalState *init_terminal(Context *ctx)
 {
-    TerminalState out;
-    out.ctx = ctx;
+    TerminalState *out = malloc(sizeof(TerminalState));
+    out->ctx = ctx;
 
-    clear_std_out(&out);
-    clear_terminal(&out);
+    clear_std_out(out);
+    clear_terminal(out);
 
     return out;
 }

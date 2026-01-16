@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "pong.h"
 #include "../geometry.h"
@@ -22,9 +23,6 @@ Player init_player(Point2D point, int W, int H)
 
     return p;
 }
-
-#include <math.h>
-#include <stdlib.h>
 
 float rand_range(float min, float max)
 {
@@ -48,21 +46,21 @@ Point2D random_vel()
     return vel;
 }
 
-PongState init_pong(int W, int H)
+PongState *init_pong(int W, int H)
 {
 
-    PongState out;
+    PongState *out = malloc(sizeof(PongState));
 
-    out.p1 = init_player(point2(-0.8, 0), W, H);
-    out.p2 = init_player(point2(0.8, 0), W, H);
+    out->p1 = init_player(point2(-0.8, 0), W, H);
+    out->p2 = init_player(point2(0.8, 0), W, H);
 
-    out.ball.pos = screen(point2(0, 0), W, H);
+    out->ball.pos = screen(point2(0, 0), W, H);
 
-    out.ball.vel = point2(0, 0);
-    out.ball.radius = 4;
+    out->ball.vel = point2(0, 0);
+    out->ball.radius = 4;
 
-    out.W = W;
-    out.H = H;
+    out->W = W;
+    out->H = H;
 
     return out;
 };
@@ -131,12 +129,12 @@ void update_pong(PongState *state)
     {
         if (outLeft)
         {
-            state->p1.score += 1;
+            state->p2.score += 1;
         };
 
         if (outRight)
         {
-            state->p2.score += 1;
+            state->p1.score += 1;
         }
 
         ball->pos = screen(point2(0, 0), state->W, state->H);

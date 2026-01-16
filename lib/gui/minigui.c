@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "cube.h"
 #include "terminal.h"
 
@@ -19,8 +21,8 @@ void initialize_window(Context *ctx)
 
     SetTargetFPS(FPS);
 
-    CubeState cube_state = init_cube(FPS);
-    ctx->active_data = &cube_state;
+    CubeState *cube_state = init_cube(FPS);
+    ctx->active_data = cube_state;
 
     while (!WindowShouldClose())
     {
@@ -31,24 +33,27 @@ void initialize_window(Context *ctx)
 
             if (IsKeyPressed(KEY_W))
             {
-                CubeState cube_state = init_cube(FPS);
-                ctx->active_data = &cube_state;
+                free(ctx->active_data);
+                CubeState *cube_state = init_cube(FPS);
+                ctx->active_data = cube_state;
                 GetCharPressed();
                 ctx->active_window = WINDOW_WELCOME;
             }
 
             if (IsKeyPressed(KEY_T))
             {
-                TerminalState terminal_state = init_terminal(ctx);
-                ctx->active_data = &terminal_state;
+                free(ctx->active_data);
+                TerminalState *terminal_state = init_terminal(ctx);
+                ctx->active_data = terminal_state;
                 GetCharPressed();
                 ctx->active_window = WINDOW_TERMINAL;
             }
 
             if (IsKeyPressed(KEY_P))
             {
-                PongState pong_state = init_pong(W, H);
-                ctx->active_data = &pong_state;
+                free(ctx->active_data);
+                PongState *pong_state = init_pong(W, H);
+                ctx->active_data = pong_state;
                 GetCharPressed();
                 ctx->active_window = WINDOW_PONG;
             }
