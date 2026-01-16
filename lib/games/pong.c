@@ -34,14 +34,11 @@ float rand_range(float min, float max)
 
 Point2D random_vel()
 {
-    Point2D vel;
-
     int side = (int)(rand() % 2);
 
     double angle = rand_range(-M_PI * 0.25, M_PI * 0.25);
 
-    vel.x = cos(angle);
-    vel.y = sin(angle);
+    Point2D vel = point2(cos(angle), sin(angle));
 
     vel = mul2(vel, 4);
 
@@ -56,17 +53,12 @@ PongState init_pong(int W, int H)
 
     PongState out;
 
-    Point2D p1 = {-0.8, 0};
-    out.p1 = init_player(p1, W, H);
+    out.p1 = init_player(point2(-0.8, 0), W, H);
+    out.p2 = init_player(point2(0.8, 0), W, H);
 
-    Point2D p2 = {0.8, 0};
-    out.p2 = init_player(p2, W, H);
+    out.ball.pos = screen(point2(0, 0), W, H);
 
-    Point2D ball = {0, 0};
-    out.ball.pos = screen(ball, W, H);
-
-    Point2D vel = random_vel();
-    out.ball.vel = vel;
+    out.ball.vel = point2(0, 0);
     out.ball.radius = 4;
 
     out.W = W;
@@ -89,7 +81,7 @@ void draw_score(Point2D pos, int score)
 {
     char buffer[3];
     snprintf(buffer, 3, "%d", score);
-    DrawText(buffer, pos.x, pos.y, 10, WHITE);
+    DrawText(buffer, pos.x, pos.y, 20, WHITE);
 }
 
 void draw_scores(PongState *state)
@@ -147,17 +139,15 @@ void update_pong(PongState *state)
             state->p2.score += 1;
         }
 
-        Point2D newPos = {0, 0};
-
-        ball->pos = screen(newPos, state->W, state->H);
-
-        Point2D newVel = random_vel();
-        ball->vel = newVel;
+        ball->pos = screen(point2(0, 0), state->W, state->H);
+        ball->vel = point2(0, 0);
     }
 
     ball->pos = add2(ball->pos, ball->vel);
     ball->vel = mul2(ball->vel, 1.0005f);
 }
+
+char *space = "<Press Space to Start>";
 
 void window_pong(PongState *state)
 {
@@ -172,6 +162,17 @@ void window_pong(PongState *state)
     draw_scores(state);
 
     update_pong(state);
+
+    if (state->ball.vel.x == 0 && state->ball.vel.y == 0)
+    {
+        int space_size = MeasureText(space, 20);
+        DrawText(space, state->W / 2 - space_size / 2, state->H / 2 * 1.5, 20, WHITE);
+
+        if (IsKeyDown(KEY_SPACE))
+        {
+            state->ball.vel = random_vel();
+        }
+    }
 
     if (IsKeyDown(KEY_W))
     {

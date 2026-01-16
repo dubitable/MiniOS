@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include "games/pong.h"
 #include "filesystem.h"
 #include "command.h"
 
@@ -238,14 +239,6 @@ int action_peek(Context *ctx, char *printto, int size, int argc, char **argv)
 
     return 1;
 }
-
-int action_pong(Context *ctx)
-{
-    ctx->active_window = WINDOW_PONG;
-
-    return 1;
-}
-
 void handle_command(Command cmd, int argc, char **argv, Context *ctx, char *printto, int size)
 {
     switch (cmd)
@@ -262,9 +255,6 @@ void handle_command(Command cmd, int argc, char **argv, Context *ctx, char *prin
     case COMMAND_GOTO:
         action_goto(ctx, printto, size, argc, argv);
         break;
-    case COMMAND_PONG:
-        action_pong(ctx);
-        break;
     default:
         break;
     }
@@ -280,7 +270,5 @@ Command command_from_string(const char *str)
         return COMMAND_PEEK;
     if (strcmp(str, "goto") == 0)
         return COMMAND_GOTO;
-    if (strcmp(str, "pong") == 0)
-        return COMMAND_PONG;
     return COMMAND_NONE;
 }

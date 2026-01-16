@@ -9,7 +9,6 @@ typedef enum
     COMMAND_MKDIR,
     COMMAND_PEEK,
     COMMAND_GOTO,
-    COMMAND_PONG,
     COMMAND_NONE
 } Command;
 

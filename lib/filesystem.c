@@ -50,6 +50,8 @@ Context *initialize()
     Context *ctx = malloc(sizeof(Context));
     ctx->root_dir = root_dir;
     ctx->active_dir = active_dir;
+    ctx->W = 500;
+    ctx->H = 500;
     ctx->active_window = WINDOW_WELCOME;
 
     return ctx;

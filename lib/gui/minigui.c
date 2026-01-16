@@ -9,8 +9,9 @@
 
 void initialize_window(Context *ctx)
 {
-    const int W = 500;
-    const int H = 500;
+    int W = ctx->W;
+    int H = ctx->H;
+
     const int FPS = 60;
 
     SetTraceLogLevel(LOG_ERROR);
@@ -19,8 +20,7 @@ void initialize_window(Context *ctx)
     SetTargetFPS(FPS);
 
     CubeState cube_state = init_cube(FPS);
-    TerminalState terminal_state;
-    PongState pong_state = init_pong(W, H);
+    ctx->active_data = &cube_state;
 
     while (!WindowShouldClose())
     {
@@ -31,41 +31,45 @@ void initialize_window(Context *ctx)
 
             if (IsKeyPressed(KEY_W))
             {
-                ctx->active_window = WINDOW_WELCOME;
+                CubeState cube_state = init_cube(FPS);
+                ctx->active_data = &cube_state;
                 GetCharPressed();
+                ctx->active_window = WINDOW_WELCOME;
             }
 
             if (IsKeyPressed(KEY_T))
             {
-                ctx->active_window = WINDOW_TERMINAL;
-                terminal_state = init_terminal(ctx);
+                TerminalState terminal_state = init_terminal(ctx);
+                ctx->active_data = &terminal_state;
                 GetCharPressed();
+                ctx->active_window = WINDOW_TERMINAL;
             }
 
             if (IsKeyPressed(KEY_P))
             {
-                ctx->active_window = WINDOW_PONG;
-                pong_state = init_pong(W, H);
+                PongState pong_state = init_pong(W, H);
+                ctx->active_data = &pong_state;
                 GetCharPressed();
+                ctx->active_window = WINDOW_PONG;
             }
         }
 
         switch (ctx->active_window)
         {
         case WINDOW_WELCOME:
-            window_welcome(&cube_state, W, H);
+            window_welcome(ctx->active_data, W, H);
             break;
 
         case WINDOW_TERMINAL:
-            window_terminal(&terminal_state);
+            window_terminal(ctx->active_data);
             break;
 
         case WINDOW_PONG:
-            window_pong(&pong_state);
+            window_pong(ctx->active_data);
             break;
 
         default:
-            window_welcome(&cube_state, W, H);
+            window_welcome(ctx->active_data, W, H);
             break;
         }
     }

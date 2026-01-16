@@ -34,80 +34,43 @@ Point3D point3(float x, float y, float z)
 
 Point2D screen(Point2D point, int w, int h)
 {
-    Point2D out;
-    out.x = (point.x + 1) / 2 * w;
-    out.y = (1 - (point.y + 1) / 2) * h;
-    return out;
+    return point2((point.x + 1) / 2 * w, (1 - (point.y + 1) / 2) * h);
 }
 
 Point2D project(Point3D point)
 {
-    Point2D out;
-    out.x = point.x / point.z;
-    out.y = point.y / point.z;
-    return out;
+    return point2(point.x / point.z, point.y / point.z);
 }
 
 Point3D rotate_xz(Point3D point, float angle)
 {
-    Point3D out;
     float c = cos(angle);
     float s = sin(angle);
 
-    out.x = point.x * c - point.z * s;
-    out.y = point.y;
-    out.z = point.x * s + point.z * c;
-    return out;
+    return point3(point.x * c - point.z * s, point.y, point.x * s + point.z * c);
 }
 
 Point3D sub3(Point3D a, Point3D b)
 {
-    Point3D out;
-
-    out.x = a.x - b.x;
-    out.y = a.y - b.y;
-    out.z = a.z - b.z;
-
-    return out;
+    return point3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
 Point3D add3(Point3D a, Point3D b)
 {
-    Point3D out;
-
-    out.x = a.x + b.x;
-    out.y = a.y + b.y;
-    out.z = a.z + b.z;
-
-    return out;
+    return point3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
 Point2D sub2(Point2D a, Point2D b)
 {
-    Point2D out;
-
-    out.x = a.x - b.x;
-    out.y = a.y - b.y;
-
-    return out;
+    return point2(a.x - b.x, a.y - b.y);
 }
 
 Point2D add2(Point2D a, Point2D b)
 {
-    Point2D out;
-
-    out.x = a.x + b.x;
-    out.y = a.y + b.y;
-
-    return out;
+    return point2(a.x + b.x, a.y + b.y);
 }
 
 Point2D mul2(Point2D a, float b)
 {
-    Point2D out;
-
-    out.x = a.x * b;
-    out.y = a.y * b;
-
-    return out;
+    return point2(a.x * b, a.y * b);
 }

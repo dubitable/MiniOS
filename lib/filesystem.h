@@ -36,6 +36,10 @@ typedef struct
     Directory *active_dir;
 
     Window active_window;
+    void *active_data;
+
+    int W;
+    int H;
 } Context;
 
 enum
