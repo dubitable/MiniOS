@@ -1,31 +1,197 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "pong.h"
+#include "../geometry.h"
 
 #include "raylib.h"
 
-void window_pong(PongState *pong_state)
+Player init_player(Point2D point, int W, int H)
 {
-    BeginDrawing();
-    ClearBackground(BLACK);
+    Player p;
+    p.pos = screen(point, W, H);
 
-    char buffer[20];
-    snprintf(buffer, 20, "%f\n", pong_state->p1.score);
-    DrawText(buffer, 50, 50, 20, WHITE);
+    p.w = 8;
+    p.h = 80;
 
-    EndDrawing();
+    p.pos.x -= p.w / 2;
+    p.pos.y -= p.h / 2;
+
+    p.score = 0;
+
+    return p;
 }
 
-PongState init_pong()
+#include <math.h>
+#include <stdlib.h>
+
+float rand_range(float min, float max)
+{
+    float scale = rand() / (float)RAND_MAX;
+    return min + scale * (max - min);
+}
+
+Point2D random_vel()
+{
+    Point2D vel;
+
+    int side = (int)(rand() % 2);
+
+    double angle = rand_range(-M_PI * 0.25, M_PI * 0.25);
+
+    vel.x = cos(angle);
+    vel.y = sin(angle);
+
+    vel = mul2(vel, 4);
+
+    if (side)
+        vel.x = -vel.x;
+
+    return vel;
+}
+
+PongState init_pong(int W, int H)
 {
 
     PongState out;
 
-    out.p1.score = 0;
-    out.p2.score = 0;
+    Point2D p1 = {-0.8, 0};
+    out.p1 = init_player(p1, W, H);
 
-    out.p1.y = 0;
-    out.p2.y = 0;
+    Point2D p2 = {0.8, 0};
+    out.p2 = init_player(p2, W, H);
+
+    Point2D ball = {0, 0};
+    out.ball.pos = screen(ball, W, H);
+
+    Point2D vel = random_vel();
+    out.ball.vel = vel;
+    out.ball.radius = 4;
+
+    out.W = W;
+    out.H = H;
 
     return out;
 };
+
+void draw_player(Player p)
+{
+    DrawRectangle(p.pos.x, p.pos.y, p.w, p.h, WHITE);
+}
+
+void draw_ball(Ball ball)
+{
+    DrawCircle(ball.pos.x, ball.pos.y, ball.radius, WHITE);
+}
+
+void draw_score(Point2D pos, int score)
+{
+    char buffer[3];
+    snprintf(buffer, 3, "%d", score);
+    DrawText(buffer, pos.x, pos.y, 10, WHITE);
+}
+
+void draw_scores(PongState *state)
+{
+    draw_score(screen(point2(-0.5, 0.9), state->W, state->H), state->p1.score);
+    draw_score(screen(point2(0.5, 0.9), state->W, state->H), state->p2.score);
+}
+
+int intersect(Player p, Ball b)
+{
+    float closestX = fmaxf(p.pos.x, fminf(b.pos.x, p.pos.x + p.w / 2));
+    float closestY = fmaxf(p.pos.y, fminf(b.pos.y, p.pos.y + p.h));
+
+    float dx = b.pos.x - closestX;
+    float dy = b.pos.y - closestY;
+
+    return (dx * dx + dy * dy) <= (b.radius * b.radius);
+}
+
+void update_pong(PongState *state)
+{
+    Ball *ball = &state->ball;
+
+    Point2D next = add2(ball->pos, ball->vel);
+
+    Ball predicted = *ball;
+    predicted.pos = next;
+
+    if (intersect(state->p1, predicted) || intersect(state->p2, predicted))
+    {
+        float dev = rand_range(-2.0f, 2.0f);
+        ball->vel.x = -ball->vel.x;
+        ball->vel.y += dev;
+    }
+
+    if (ball->pos.y - ball->radius <= 0 || ball->pos.y + ball->radius >= state->H)
+    {
+        float dev = rand_range(-2.0f, 2.0f);
+        ball->vel.y = -ball->vel.y;
+        ball->vel.x += dev;
+    }
+
+    int outLeft = ball->pos.x - ball->radius <= 0;
+    int outRight = ball->pos.x + ball->radius >= state->H;
+
+    if (outLeft || outRight)
+    {
+        if (outLeft)
+        {
+            state->p1.score += 1;
+        };
+
+        if (outRight)
+        {
+            state->p2.score += 1;
+        }
+
+        Point2D newPos = {0, 0};
+
+        ball->pos = screen(newPos, state->W, state->H);
+
+        Point2D newVel = random_vel();
+        ball->vel = newVel;
+    }
+
+    ball->pos = add2(ball->pos, ball->vel);
+    ball->vel = mul2(ball->vel, 1.0005f);
+}
+
+void window_pong(PongState *state)
+{
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    draw_player(state->p1);
+    draw_player(state->p2);
+
+    draw_ball(state->ball);
+
+    draw_scores(state);
+
+    update_pong(state);
+
+    if (IsKeyDown(KEY_W))
+    {
+        state->p1.pos.y -= 5;
+    }
+
+    if (IsKeyDown(KEY_S))
+    {
+        state->p1.pos.y += 5;
+    }
+
+    if (IsKeyDown(KEY_UP))
+    {
+        state->p2.pos.y -= 5;
+    }
+
+    if (IsKeyDown(KEY_DOWN))
+    {
+        state->p2.pos.y += 5;
+    }
+
+    EndDrawing();
+}

@@ -20,7 +20,7 @@ void initialize_window(Context *ctx)
 
     CubeState cube_state = init_cube(FPS);
     TerminalState terminal_state;
-    PongState pong_state;
+    PongState pong_state = init_pong(W, H);
 
     while (!WindowShouldClose())
     {
@@ -45,7 +45,7 @@ void initialize_window(Context *ctx)
             if (IsKeyPressed(KEY_P))
             {
                 ctx->active_window = WINDOW_PONG;
-                pong_state = init_pong();
+                pong_state = init_pong(W, H);
                 GetCharPressed();
             }
         }

@@ -50,10 +50,10 @@ CubeState init_cube(int FPS)
 
 Point3D handle_rotate(Point3D point, Point3D center, Point3D offset, float angle)
 {
-    Point3D subbed = sub(point, center);
+    Point3D subbed = sub3(point, center);
     Point3D rotated = rotate_xz(subbed, angle);
-    Point3D added = add(rotated, center);
-    Point3D offsetted = add(added, offset);
+    Point3D added = add3(rotated, center);
+    Point3D offsetted = add3(added, offset);
 
     return offsetted;
 }
