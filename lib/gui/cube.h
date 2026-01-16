@@ -1,18 +1,7 @@
 #ifndef CUBE_H_INCLUDED
 #define CUBE_H_INCLUDED
 
-typedef struct
-{
-    float x;
-    float y;
-} Point2D;
-
-typedef struct
-{
-    float x;
-    float y;
-    float z;
-} Point3D;
+#include "../geometry.h"
 
 typedef struct
 {
@@ -21,6 +10,7 @@ typedef struct
     float angle;
     Point3D points[8];
     int edges[12][2];
+    Point3D center;
 } CubeState;
 
 CubeState init_cube(int FPS);

@@ -21,6 +21,6 @@ typedef struct
 Args *parse_line(char line[]);
 
 Command command_from_string(const char *str);
-void handle_command(TerminalState *state, Command cmd, int argc, char **argv);
+void handle_command(Command cmd, int argc, char **argv, Context *ctx, char *printto, int size);
 
 #endif

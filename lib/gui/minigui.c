@@ -6,6 +6,8 @@
 #include "cube.h"
 #include "terminal.h"
 
+#include "../games/pong.h"
+
 #include "../command.h"
 #include "../filesystem.h"
 #include "raylib.h"
@@ -22,7 +24,8 @@ void initialize_window(Context *ctx)
     SetTargetFPS(FPS);
 
     CubeState cube_state = init_cube(FPS);
-    TerminalState terminal_state = init_terminal(ctx);
+    TerminalState terminal_state;
+    PongState pong_state;
 
     while (!WindowShouldClose())
     {
@@ -40,6 +43,14 @@ void initialize_window(Context *ctx)
             if (IsKeyPressed(KEY_T))
             {
                 ctx->active_window = WINDOW_TERMINAL;
+                terminal_state = init_terminal(ctx);
+                GetCharPressed();
+            }
+
+            if (IsKeyPressed(KEY_P))
+            {
+                ctx->active_window = WINDOW_PONG;
+                pong_state = init_pong();
                 GetCharPressed();
             }
         }
@@ -52,6 +63,10 @@ void initialize_window(Context *ctx)
 
         case WINDOW_TERMINAL:
             window_terminal(&terminal_state);
+            break;
+
+        case WINDOW_PONG:
+            window_pong(&pong_state);
             break;
 
         default:

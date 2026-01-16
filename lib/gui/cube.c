@@ -3,68 +3,7 @@
 
 #include "raylib.h"
 #include "cube.h"
-
-void draw_point(Point2D point)
-{
-    DrawCircle(point.x, point.y, 2, RAYWHITE);
-}
-
-void draw_line(Point2D point1, Point2D point2)
-{
-    DrawLine(point1.x, point1.y, point2.x, point2.y, RAYWHITE);
-}
-
-Point2D screen(Point2D point, int w, int h)
-{
-    Point2D out;
-    out.x = (point.x + 1) / 2 * w;
-    out.y = (1 - (point.y + 1) / 2) * h;
-    return out;
-}
-
-Point2D project(Point3D point)
-{
-    Point2D out;
-    out.x = point.x / point.z;
-    out.y = point.y / point.z;
-    return out;
-}
-
-Point3D rotate_xz(Point3D point, float angle)
-{
-    Point3D out;
-    float c = cos(angle);
-    float s = sin(angle);
-
-    out.x = point.x * c - point.z * s;
-    out.y = point.y;
-    out.z = point.x * s + point.z * c;
-    return out;
-}
-
-Point3D sub(Point3D a, Point3D b)
-{
-    Point3D out;
-
-    out.x = a.x - b.x;
-    out.y = a.y - b.y;
-    out.z = a.z - b.z;
-
-    return out;
-}
-
-Point3D add(Point3D a, Point3D b)
-{
-    Point3D out;
-
-    out.x = a.x + b.x;
-    out.y = a.y + b.y;
-    out.z = a.z + b.z;
-
-    return out;
-}
-
-Point3D center = {0, 0, 2.5f};
+#include "../geometry.h"
 
 CubeState init_cube(int FPS)
 {
@@ -99,10 +38,23 @@ CubeState init_cube(int FPS)
         {2, 6},
         {3, 7}};
 
+    Point3D center = {0, 0, 2.5f};
+    out.center = center;
+
     memcpy(out.points, points, sizeof(points));
     memcpy(out.edges, edges, sizeof(edges));
 
     return out;
+}
+
+Point3D handle_rotate(Point3D point, Point3D center, Point3D offset, float angle)
+{
+    Point3D subbed = sub(point, center);
+    Point3D rotated = rotate_xz(subbed, angle);
+    Point3D added = add(rotated, center);
+    Point3D offsetted = add(added, offset);
+
+    return offsetted;
 }
 
 void window_welcome(CubeState *state, int W, int H)
@@ -118,8 +70,10 @@ void window_welcome(CubeState *state, int W, int H)
     for (int i = 0; i < (int)(sizeof(state->edges) / sizeof(int[2])); i++)
     {
         Point3D offset = {0, 0, state->dz};
-        Point3D a = add(add(rotate_xz(sub(state->points[state->edges[i][0]], center), state->angle), center), offset);
-        Point3D b = add(add(rotate_xz(sub(state->points[state->edges[i][1]], center), state->angle), center), offset);
+
+        Point3D a = handle_rotate(state->points[state->edges[i][0]], state->center, offset, state->angle);
+        Point3D b = handle_rotate(state->points[state->edges[i][1]], state->center, offset, state->angle);
+
         draw_line(screen(project(a), W, H), screen(project(b), W, H));
     }
 

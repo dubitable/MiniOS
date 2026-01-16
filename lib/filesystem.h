@@ -28,7 +28,8 @@ struct File
 typedef enum
 {
     WINDOW_WELCOME,
-    WINDOW_TERMINAL
+    WINDOW_TERMINAL,
+    WINDOW_PONG
 } Window;
 
 typedef struct
@@ -45,18 +46,6 @@ enum
     INPUT_SIZE = 100,
     STDOUT_SIZE = 200,
 };
-
-typedef struct
-{
-    Context *ctx;
-    char path[PATH_SIZE];
-    Point2D cursor;
-
-    char input[INPUT_SIZE];
-    int input_count;
-
-    char std_out[STDOUT_SIZE];
-} TerminalState;
 
 Context *initialize();
 
