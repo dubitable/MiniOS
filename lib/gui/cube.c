@@ -66,8 +66,17 @@ void window_welcome(CubeState *state, int W, int H)
 
     ClearBackground(BLACK);
 
+    if (IsKeyDown(KEY_DOWN) && state->dz >= -1.5)
+    {
+        state->dz -= 10 * state->dt;
+    }
+
+    if (IsKeyDown(KEY_UP) && state->dz <= 1.5)
+    {
+        state->dz += 10 * state->dt;
+    }
+
     state->angle += 2 * M_PI * state->dt;
-    // dz += 1 * dt;
 
     for (int i = 0; i < (int)(sizeof(state->edges) / sizeof(int[2])); i++)
     {
