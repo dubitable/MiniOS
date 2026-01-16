@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "gui/terminal.h"
 #include "filesystem.h"
 
 void where(Directory *current, char *buffer, int size)

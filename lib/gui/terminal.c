@@ -1,9 +1,9 @@
-#include <string.h>
 #include <stdio.h>
 
 #include "terminal.h"
 #include "../command.h"
 #include "../filesystem.h"
+
 #include "raylib.h"
 
 const int FONT_SIZE = 20;
@@ -58,7 +58,7 @@ void window_terminal(TerminalState *state)
     {
         clear_std_out(state);
 
-        if ((!IsKeyPressed(KEY_SEMICOLON)) && (key >= 32) && (key <= 125) && (state->input_count < INPUT_SIZE))
+        if ((key >= 32) && (key <= 125) && (state->input_count < INPUT_SIZE))
         {
             state->input[state->input_count] = (char)key;
             state->input[state->input_count + 1] = '\0';

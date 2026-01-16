@@ -1,15 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
 #include "cube.h"
 #include "terminal.h"
 
 #include "../games/pong.h"
-
 #include "../command.h"
 #include "../filesystem.h"
+
 #include "raylib.h"
 
 void initialize_window(Context *ctx)

@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "../filesystem.h"
 #include "pong.h"
+
 #include "raylib.h"
 
 void window_pong(PongState *pong_state)

@@ -1,8 +1,6 @@
 #ifndef FILESYSTEM_H_INCLUDED
 #define FILESYSTEM_H_INCLUDED
 
-#include "gui/cube.h"
-
 typedef struct File File;
 typedef struct Dir Directory;
 

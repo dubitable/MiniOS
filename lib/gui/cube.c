@@ -1,9 +1,10 @@
 #include <math.h>
 #include <string.h>
 
-#include "raylib.h"
 #include "cube.h"
 #include "../geometry.h"
+
+#include "raylib.h"
 
 CubeState init_cube(int FPS)
 {
