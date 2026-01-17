@@ -66,7 +66,7 @@ void window_welcome(CubeState *state, int W, int H)
 
     ClearBackground(BLACK);
 
-    if (IsKeyDown(KEY_DOWN) && state->dz >= -1.5)
+    if (IsKeyDown(KEY_DOWN) && state->dz >= -0.7)
     {
         state->dz -= 10 * state->dt;
     }
